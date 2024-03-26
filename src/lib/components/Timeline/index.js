@@ -39,7 +39,7 @@ export default function Timeline(props) {
       canvas2.current,
       p.data,
       p.endTime,
-      () => (props.audioRef ? props.audioRef.current : canvasAudio.current),
+      () => (props.player ? props.player.current : (props.audioRef ? props.audioRef.current : canvasAudio.current)),
       changeAlignment || defaultFunction,
       changeZoomLevel || defaultFunction,
       changeShift || defaultFunction,
@@ -89,9 +89,13 @@ export default function Timeline(props) {
   };
   return (
     <div style={style} className="timeline-editor">
-      <div hidden>
-        <audio src={props.src} ref={props.audioRef || canvasAudio} />
-      </div>
+      {
+        props.player ?
+        <></> :
+        <div hidden>
+          <audio src={props.src} ref={props.audioRef || canvasAudio} />
+        </div>
+      }
       <div className="wrap z-index-2">
         <canvas ref={canvas1}></canvas>
       </div>

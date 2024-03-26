@@ -17,6 +17,7 @@ function App() {
         changeZoomLevel={changeZoomLevel}
         changeShift={changeShift}
         setAligns={setAligns}
+        player={null}
         audioRef={audioRef}
         src={
           "https://dls.music-fa.com/tagdl/99/Behnam%20Safavi%20-%20Name%20Eshgh%20(128).mp3"

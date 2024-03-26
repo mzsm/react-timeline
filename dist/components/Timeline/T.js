@@ -1,24 +1,13 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true,
+  value: true
 });
 exports.default = TimeLine;
 
-const toFixed2 = (i) => parseInt(i * 100) / 100;
+const toFixed2 = i => parseInt(i * 100) / 100;
 
-function TimeLine(
-  canvas,
-  canvas2,
-  alignments,
-  endTime,
-  getPlayer,
-  changeAlignment,
-  changeZoomLevel,
-  changeShift,
-  tellAreaChangesToRectComponent,
-  options
-) {
+function TimeLine(canvas, canvas2, alignments, endTime, getPlayer, changeAlignment, changeZoomLevel, changeShift, tellAreaChangesToRectComponent, options) {
   // constants
   const LINE_HEIGHT = 40;
   const TRACK_HEIGHT = 40;
@@ -44,11 +33,8 @@ function TimeLine(
   } // element setting
 
   let animationID;
-  let w =
-    (canvas.width =
-    canvas2.width =
-      canvas.parentElement.parentElement.clientWidth);
-  let h = (canvas.height = canvas2.height = TIMELINE_HEIGHT);
+  let w = canvas.width = canvas2.width = canvas.parentElement.parentElement.clientWidth;
+  let h = canvas.height = canvas2.height = TIMELINE_HEIGHT;
   let scrollPosition = 0;
   let scrollSize = w;
   let minimumZoomLevel = w / endTime;
@@ -105,7 +91,7 @@ function TimeLine(
     this.active = false;
     this.index = index;
 
-    this.draw = (context) => {
+    this.draw = context => {
       context.save();
       this.x = toFixed2(this.x);
       this.edge = toFixed2(this.edge);
@@ -136,17 +122,8 @@ function TimeLine(
       if (this.selected) context.fillStyle = options.colors.selectedText;
       let space = this.edge;
       var rat = ctx.measureText(this.text).width / space;
-      let trimedText =
-        rat <= 1
-          ? this.text
-          : this.text.substr(0, Math.floor((1 / rat) * this.text.length) - 1);
-      if (trimedText && this.edge > 20)
-        ctx.fillText(
-          trimedText,
-          this.x + 1 + shift,
-          this.y + 22,
-          this.edge - 2
-        );
+      let trimedText = rat <= 1 ? this.text : this.text.substr(0, Math.floor(1 / rat * this.text.length) - 1);
+      if (trimedText && this.edge > 20) ctx.fillText(trimedText, this.x + 1 + shift, this.y + 22, this.edge - 2);
       context.restore();
     };
   }
@@ -159,14 +136,14 @@ function TimeLine(
     let yyyy = event.pageY - canvasCoords.y - window.pageYOffset;
     return {
       x: xxxx,
-      y: yyyy,
+      y: yyyy
     };
   }
 
   function getOffsetCoords(mouse, rect) {
     return {
       x: mouse.x - rect.x,
-      y: mouse.y - rect.y,
+      y: mouse.y - rect.y
     };
   }
 
@@ -177,17 +154,14 @@ function TimeLine(
   }
 
   function resize() {
-    w =
-      canvas.width =
-      canvas2.width =
-        canvas.parentElement.parentElement.clientWidth;
+    w = canvas.width = canvas2.width = canvas.parentElement.parentElement.clientWidth;
     h = canvas.height = canvas2.height = TIMELINE_HEIGHT;
     drawBG(bgCtx);
   }
 
   function changeZoom(deltaY) {
     handleZoom({
-      deltaY,
+      deltaY
     });
   }
 
@@ -223,7 +197,7 @@ function TimeLine(
     }
 
     let ratio = 1;
-    prtcls.forEach((p) => {
+    prtcls.forEach(p => {
       let px = p.x;
       let originalPX = p.x / originalZoomLevel;
       let originalEdge = p.edge / originalZoomLevel;
@@ -306,7 +280,8 @@ function TimeLine(
       resetActives();
     }
 
-    checkShift();
+    if (moving || scrolling || swaping) checkShift();
+    drawBG(bgCtx);
   }
   function handleScrolling() {
     if (zoomLevel === minimumZoomLevel) return;
@@ -319,9 +294,9 @@ function TimeLine(
     drawBG(bgCtx);
   }
   function resetActives() {
-    prtcls.forEach((d) => {
-      d.active = false;
-    });
+    // prtcls.forEach((d) => {
+    //   d.active = false;
+    // });
   }
   function handleMoving() {
     if (!currentPrtcl) return;
@@ -338,13 +313,8 @@ function TimeLine(
       currentPrtcl.x = pos;
       currentPrtcl.y = LINE_HEIGHT;
     } else {
-      if (
-        movingDirection === "right" &&
-        pos > currentPrtcl.x + currentPrtcl.edge
-      )
-        currentPrtcl.x = max - currentPrtcl.edge;
-      if (movingDirection === "left" && pos < currentPrtcl.x)
-        currentPrtcl.x = min;
+      if (movingDirection === "right" && pos > currentPrtcl.x + currentPrtcl.edge) currentPrtcl.x = max - currentPrtcl.edge;
+      if (movingDirection === "left" && pos < currentPrtcl.x) currentPrtcl.x = min;
     }
   }
   function outPrtcls() {
@@ -361,7 +331,7 @@ function TimeLine(
       return {
         begin,
         end,
-        text,
+        text
       };
     });
     changeAlignment(data);
@@ -394,16 +364,7 @@ function TimeLine(
 
   function handleDbClick() {
     if (currentPrtcl) {
-      if (
-        cursorInRect(
-          mouse.x,
-          mouse.y,
-          currentPrtcl.x,
-          currentPrtcl.y,
-          currentPrtcl.edge,
-          currentPrtcl.edge
-        )
-      ) {
+      if (cursorInRect(mouse.x, mouse.y, currentPrtcl.x, currentPrtcl.y, currentPrtcl.edge, currentPrtcl.edge)) {
         currentPrtcl.selected = true;
         currentPrtcl.offset = getOffsetCoords(mouse, currentPrtcl);
         player.currentTime = currentPrtcl.x / zoomLevel;
@@ -436,16 +397,7 @@ function TimeLine(
     }
 
     if (currentPrtcl) {
-      if (
-        cursorInRect(
-          mouse.x,
-          mouse.y,
-          currentPrtcl.x,
-          currentPrtcl.y,
-          currentPrtcl.edge,
-          currentPrtcl.edge
-        )
-      ) {
+      if (cursorInRect(mouse.x, mouse.y, currentPrtcl.x, currentPrtcl.y, currentPrtcl.edge, currentPrtcl.edge)) {
         currentPrtcl.selected = true;
         currentPrtcl.offset = getOffsetCoords(mouse, currentPrtcl);
 
@@ -459,10 +411,7 @@ function TimeLine(
       // hande click to change player current time
       if (mouse.y < TIME_BAR_MARGIN) {
         player.currentTime = (mouse.x - shift) / zoomLevel;
-      } else if (
-        mouse.y > TIME_BAR_MARGIN &&
-        mouse.y < TIMELINE_HEIGHT - SCROLL_BAR_HEIGHT
-      ) {
+      } else if (mouse.y > TIME_BAR_MARGIN && mouse.y < TIMELINE_HEIGHT - SCROLL_BAR_HEIGHT) {
         swaping = true;
       }
     }
@@ -490,24 +439,17 @@ function TimeLine(
     moving = false;
     swaping = false;
     stopMove = false;
-    prtcls.forEach((e) => (e.selected = false));
+    prtcls.forEach(e => e.selected = false);
     if (currentPrtcl) currentPrtcl.active = true;
     outPrtcls();
   }
 
   function checkResizing() {
     if (currentPrtcl) {
-      if (
-        mouse.x >=
-          currentPrtcl.x + shift + currentPrtcl.edge - RESIZE_MODE_EDGE &&
-        mouse.x <= currentPrtcl.x + shift + currentPrtcl.edge
-      ) {
+      if (mouse.x >= currentPrtcl.x + shift + currentPrtcl.edge - RESIZE_MODE_EDGE && mouse.x <= currentPrtcl.x + shift + currentPrtcl.edge) {
         rightResize = true;
         canvas.classList.add("col-resize");
-      } else if (
-        mouse.x <= currentPrtcl.x + shift + RESIZE_MODE_EDGE &&
-        mouse.x >= currentPrtcl.x + shift
-      ) {
+      } else if (mouse.x <= currentPrtcl.x + shift + RESIZE_MODE_EDGE && mouse.x >= currentPrtcl.x + shift) {
         leftResize = true;
         canvas.classList.add("col-resize");
       } else {
@@ -557,24 +499,19 @@ function TimeLine(
     if (leftSub) min = leftSub.x + leftSub.edge + shift;
     if (rightSub) max = rightSub.x + shift;
 
-    if (currentPrtcl?.selected) {
+    if (currentPrtcl.selected) {
       if (rightResize) {
         let distanceToBegin = mouse.x - currentPrtcl.x - shift;
 
-        if (
-          mouse.x <= max &&
-          mouse.x > currentPrtcl.x + MINIMUM_BLOCK_TIME + shift
-        ) {
+        if (mouse.x <= max && mouse.x > currentPrtcl.x + MINIMUM_BLOCK_TIME + shift) {
           currentPrtcl.edge = distanceToBegin;
         } else if (mouse.x > max) {
-          let innersubs = prtcls.filter(
-            (p) => p.x > currentPrtcl.x && p.x + p.edge < mousePosition
-          );
+          let innersubs = prtcls.filter(p => p.x > currentPrtcl.x && p.x + p.edge < mousePosition);
           if (innersubs.length > 1) return;
           currentPrtcl.edge = distanceToBegin;
           newTime = currentPrtcl.x + currentPrtcl.edge;
-          let inners = prtcls.filter((p) => p.x > currentPrtcl.x);
-          inners.forEach((inner) => {
+          let inners = prtcls.filter(p => p.x > currentPrtcl.x);
+          inners.forEach(inner => {
             if (inner.x < newTime) {
               if (inner.edge > MINIMUM_BLOCK_TIME * zoomLevel) {
                 let endPoint = inner.x + inner.edge;
@@ -595,19 +532,14 @@ function TimeLine(
       } else {
         let endPoint = currentPrtcl.x + currentPrtcl.edge;
 
-        if (
-          mouse.x > min &&
-          mouse.x < currentPrtcl.x + currentPrtcl.edge - 0.3 + shift
-        ) {
+        if (mouse.x > min && mouse.x < currentPrtcl.x + currentPrtcl.edge - 0.3 + shift) {
           currentPrtcl.x = mouse.x - shift;
           currentPrtcl.edge = endPoint - mouse.x + shift;
         } else if (mouse.x < min) {
           if (stopMove) return;
-          let innersubs = prtcls.filter(
-            (p) => p.x + p.edge > mousePosition && p.x < currentPrtcl.x
-          );
+          let innersubs = prtcls.filter(p => p.x + p.edge > mousePosition && p.x < currentPrtcl.x);
           if (innersubs.length > 1) return;
-          let inners = prtcls.filter((p) => p.x < mouse.x - shift);
+          let inners = prtcls.filter(p => p.x < mouse.x - shift);
           newTime = mouse.x - shift;
 
           for (let i = inners.length - 1; i >= 0; i--) {
@@ -635,8 +567,7 @@ function TimeLine(
 
   function toTime(s, withMilliSecond) {
     try {
-      if (withMilliSecond)
-        return new Date(s * 1000).toISOString().substr(11, 11);
+      if (withMilliSecond) return new Date(s * 1000).toISOString().substr(11, 11);
       return new Date(s * 1000).toISOString().substr(11, 8);
     } catch (error) {
       return "";
@@ -644,18 +575,7 @@ function TimeLine(
   }
 
   function setData(aligns) {
-    prtcls = aligns.map(
-      (p, i) =>
-        new Square(
-          p.begin * zoomLevel,
-          LINE_HEIGHT,
-          (p.end - p.begin) * zoomLevel,
-          i,
-          p.text,
-          p.startIndex,
-          p.endIndex
-        )
-    );
+    prtcls = aligns.map((p, i) => new Square(p.begin * zoomLevel, LINE_HEIGHT, (p.end - p.begin) * zoomLevel, i, p.text, p.startIndex, p.endIndex));
     return prtcls;
   }
 
@@ -764,22 +684,10 @@ function TimeLine(
           ctx.lineTo(i, 30);
           context.fillStyle = "grey";
           if (zoomLevel > 50) {
-            ctx.fillText(
-              ` ${toTime((i - shift) / zoomLevel)}`,
-              i,
-              30,
-              zoomLevel - 2
-            );
+            ctx.fillText(` ${toTime((i - shift) / zoomLevel)}`, i, 30, zoomLevel - 2);
           } else {
             // let viewPortTime = endTimeShow - beginingTimeShow;
-            ctx.fillText(
-              ` ${new Date(((i - shift) / zoomLevel) * 1000)
-                .toISOString()
-                .substr(endTime > 7000 ? 11 : 14, 5)}`,
-              i,
-              30,
-              zoomLevel - 2
-            );
+            ctx.fillText(` ${new Date((i - shift) / zoomLevel * 1000).toISOString().substr(endTime > 7000 ? 11 : 14, 5)}`, i, 30, zoomLevel - 2);
           }
         } else {
           ctx.moveTo(i, 0);
@@ -794,21 +702,11 @@ function TimeLine(
   }
 
   function handleClick(e) {
-    scrolling =
-      cursorInScrollBar() &&
-      isMouseDown &&
-      !resizing &&
-      !moving &&
-      !resizing & !swaping;
+    scrolling = cursorInScrollBar() && isMouseDown && !resizing && !moving && !resizing & !swaping;
   }
 
   function cursorInScrollBar() {
-    if (
-      mouse.x > scrollPosition &&
-      mouse.x < scrollPosition + scrollSize &&
-      mouse.y > TIMELINE_HEIGHT - SCROLL_BAR_HEIGHT &&
-      mouse.y < TIMELINE_HEIGHT
-    ) {
+    if (mouse.x > scrollPosition && mouse.x < scrollPosition + scrollSize && mouse.y > TIMELINE_HEIGHT - SCROLL_BAR_HEIGHT && mouse.y < TIMELINE_HEIGHT) {
       return true;
     } else {
       if (scrolling && !resizing && !swaping) return true;
@@ -835,10 +733,7 @@ function TimeLine(
     context.save();
     context.fillStyle = options.colors.scrollBarBackground;
     context.fillRect(0, TIMELINE_HEIGHT - 10, w, 10);
-    context.fillStyle =
-      cursorInScroll || scrolling
-        ? options.colors.scrollBarHover
-        : options.colors.scrollBar;
+    context.fillStyle = cursorInScroll || scrolling ? options.colors.scrollBarHover : options.colors.scrollBar;
     let d = endTimeShow - beginingTimeShow;
     let rat = d / endTime;
     scrollSize = w * rat;
@@ -846,12 +741,7 @@ function TimeLine(
     let ratio = beginingTimeShow / endTime;
     scrollPosition = ratio * w;
     let padding = 1;
-    context.fillRect(
-      scrollPosition,
-      TIMELINE_HEIGHT - SCROLL_BAR_HEIGHT + padding,
-      scrollSize,
-      SCROLL_BAR_HEIGHT - 2 - 2 * padding
-    );
+    context.fillRect(scrollPosition, TIMELINE_HEIGHT - SCROLL_BAR_HEIGHT + padding, scrollSize, SCROLL_BAR_HEIGHT - 2 - 2 * padding);
     context.restore();
   }
 
@@ -894,10 +784,7 @@ function TimeLine(
     var _player;
 
     if (!player) player = getPlayer();
-    currentTime =
-      ((_player = player) === null || _player === void 0
-        ? void 0
-        : _player.currentTime) || 0;
+    currentTime = ((_player = player) === null || _player === void 0 ? void 0 : _player.currentTime) || 0;
     calculateViewPortTimes();
     if (player) handleCursorOutOfViewPort(currentTime); //clear paper
 
@@ -906,14 +793,7 @@ function TimeLine(
     if (!moving) currentPrtclsIndex = -1;
     currentHoveredIndex = -1;
     prtcls.filter((e, i) => {
-      let isHoveredPrtcl = cursorInRect(
-        mouse.x,
-        mouse.y,
-        e.x,
-        e.y,
-        e.edge,
-        e.edge
-      );
+      let isHoveredPrtcl = cursorInRect(mouse.x, mouse.y, e.x, e.y, e.edge, e.edge);
       let position = currentTime * zoomLevel + shift; //player on box
 
       if (position - shift >= e.x && position - shift <= e.x + e.edge) {
@@ -923,9 +803,7 @@ function TimeLine(
       if (isHoveredPrtcl && !resizing && !moving) currentPrtclsIndex = i;
       e.active = !!isHoveredPrtcl; //check prtcls is in viewport
 
-      let condition =
-        (e.x >= -1 * shift && e.x + e.edge < -1 * shift + w) ||
-        (e.x + e.edge > -1 * shift && e.x < -1 * shift + w);
+      let condition = e.x >= -1 * shift && e.x + e.edge < -1 * shift + w || e.x + e.edge > -1 * shift && e.x < -1 * shift + w;
 
       if (condition) {
         e.draw(ctx);
@@ -957,6 +835,6 @@ function TimeLine(
     setData,
     cancelAnimate,
     changeZoom,
-    changeCursorViewPort,
+    changeCursorViewPort
   };
 }
